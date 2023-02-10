@@ -152,6 +152,9 @@ class Tool(QWidget):
             res,sort_keys=True,
             indent=4,
             ensure_ascii=False))
+    def add_widget(self):
+        """添加控件"""
+        pass
 
     
 
