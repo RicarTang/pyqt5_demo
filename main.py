@@ -129,7 +129,9 @@ class Tool(QWidget):
         # 窗口设置布局
         self.setLayout(self.wlayout)
         
-    
+    def description_decide(self):
+        """判断有几个lineEdit,循环拿取内容,return一个list"""
+        pass
         
     def show_text(self):
         """textEdit控件显示文本"""
@@ -150,6 +152,8 @@ class Tool(QWidget):
             res,sort_keys=True,
             indent=4,
             ensure_ascii=False))
+
+    
 
 
 
