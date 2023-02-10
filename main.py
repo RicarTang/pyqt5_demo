@@ -15,7 +15,8 @@ class Tool(QWidget):
         # 设置布局
         self.set_layout()
         # button监听事件，信号插槽
-        self.button.clicked.connect(self.show_text)
+        self.button_start.clicked.connect(self.show_text)  # 点击开始
+        self.button_add.clicked.connect(self.add_widget)  # 动态添加控件
         
         # resize与move方法的整合方法，窗口大小与鼠标放大缩小/移动
         self.setGeometry(300,300,1000,500)
@@ -27,8 +28,10 @@ class Tool(QWidget):
     
     def set_control(self):
         """设置窗口控件"""
-        # button
-        self.button = QPushButton()
+        # button_start
+        self.button_start = QPushButton()
+        # button_add
+        self.button_add = QPushButton()
         # textEdit
         self.text_edit = QTextEdit()
         # lable
@@ -51,7 +54,7 @@ class Tool(QWidget):
         self.line_header = QLineEdit()
         self.line_title = QLineEdit()
         self.line_force = QLineEdit()
-        self.button = QPushButton("start")
+        self.button_start = QPushButton("start")
         self.text = QTextEdit()
 
     def set_layout(self):
@@ -110,8 +113,8 @@ class Tool(QWidget):
         # force
         self.hlayout6.addWidget(self.lable_force)
         self.hlayout6.addWidget(self.line_force)
-        # button
-        self.hlayout7.addWidget(self.button)
+        # button_start
+        self.hlayout7.addWidget(self.button_start)
 
         # 添加布局
         # 标签/输入框垂直布局
