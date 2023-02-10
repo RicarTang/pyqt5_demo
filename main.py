@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton, QLabel,QLineEdit,QTextEdit,QF
     QHBoxLayout, QVBoxLayout, QApplication)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
+import json
 
 
 class Tool(QWidget):
@@ -17,7 +18,7 @@ class Tool(QWidget):
         self.button.clicked.connect(self.show_text)
         
         # resize与move方法的整合方法，窗口大小与鼠标放大缩小/移动
-        self.setGeometry(300,300,500,300)
+        self.setGeometry(300,300,1000,500)
         self.setWindowTitle("Tool")
         # 设置窗口图标
         self.setWindowIcon(QIcon("./tool.jpg"))
@@ -70,7 +71,7 @@ class Tool(QWidget):
         splitter1 = QSplitter(Qt.Horizontal)
         splitter1.addWidget(topleft)
         splitter1.addWidget(self.text_edit)
-        splitter1.setSizes([200,100])  # 设置大小
+        splitter1.setSizes([200,100])  # 设置两边frame比例大小
         
         splitter2 = QSplitter(Qt.Vertical)
         splitter2.addWidget(splitter1)
@@ -132,7 +133,23 @@ class Tool(QWidget):
         
     def show_text(self):
         """textEdit控件显示文本"""
-        pass
+        res = { 
+               "android": f"{self.line_android.text()}",  
+                "version": f"{self.line_version.text()}",
+                "description": 
+                     ["1.新增交易详情页，展示历史交易数据;",  
+                       "2.新增BFMeta/BFChain/CCChain等链的非主权益币种;",
+                           "3.修复转账时ETH等链手续费显示错误的BUG."
+                           ],
+                "header": f"{self.line_header.text()}",     
+                "title": f"{self.line_title.text()}",    
+                "force": f"{self.line_force.text()}"
+                }
+        # setPlainText()方法显示文本
+        self.text_edit.setPlainText(json.dumps(
+            res,sort_keys=True,
+            indent=4,
+            ensure_ascii=False))
 
 
 
