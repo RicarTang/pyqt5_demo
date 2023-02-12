@@ -178,7 +178,10 @@ class Tool(QMainWindow):
         text_list = []
         for k, v in self.local_var.items():
             if k.startswith("line_description"):
-                text_list.append(v.text())
+                try:
+                    text_list.append(v.text())
+                except RuntimeError as e:
+                    print(e)
         return text_list
 
     def add_widget(self):
