@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton, QLabel, QLineEdit, QTextEdit,
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 import json
+import sip
 
 
 class Tool(QMainWindow):
@@ -32,8 +33,8 @@ class Tool(QMainWindow):
         self.hlayout5 = QHBoxLayout()  # title
         self.hlayout6 = QHBoxLayout()  # force
         self.hlayout7 = QHBoxLayout()  # button start
-        self.vlayout1 = QVBoxLayout()
-        self.vlayout2 = QVBoxLayout()
+        self.vlayout1 = QVBoxLayout()  # 左侧控件盒子
+        self.vlayout2 = QVBoxLayout()  # description add clear按钮盒子
         self.vlayout3 = QVBoxLayout()  # description lineEdit控件布局
         self.widget.setLayout(self.wlayout)  # 添加全局layout到中心窗口
         # 动态控件layout
@@ -51,6 +52,8 @@ class Tool(QMainWindow):
         self.button_add = QPushButton("add")
         # button_start
         self.button_start = QPushButton("start")
+        # button_clear
+        self.button_clear = QPushButton("clear")
         # lineEdit
         self.line_android = QLineEdit()
         self.line_version = QLineEdit()
@@ -83,6 +86,7 @@ class Tool(QMainWindow):
         # button监听事件，信号插槽
         self.button_start.clicked.connect(self.show_text)  # 点击开始
         self.button_add.clicked.connect(self.add_widget)  # 动态添加控件
+        self.button_clear.clicked.connect(self.clear_widget)  # clear按钮绑定事件
 
     def set_control(self):
         """设置窗口控件属性"""
@@ -93,6 +97,13 @@ class Tool(QMainWindow):
         self.lable_header.setText("header")
         self.lable_title.setText("title")
         self.lable_force.setText("force")
+        # 设置label控件大小
+        self.lable_android.setFixedSize(70, 20)
+        self.lable_version.setFixedSize(70, 20)
+        self.lable_desription.setFixedSize(70, 20)
+        self.lable_header.setFixedSize(70, 20)
+        self.lable_title.setFixedSize(70, 20)
+        self.lable_force.setFixedSize(70, 20)
 
     def set_layout(self):
         """设置窗口布局"""
@@ -142,7 +153,9 @@ class Tool(QMainWindow):
         # button_start
         self.hlayout7.addWidget(self.button_start)
         # button_add
-        self.hlayout3.addWidget(self.button_add)
+        self.hlayout3.addLayout(self.vlayout2)
+        self.vlayout2.addWidget(self.button_add)
+        self.vlayout2.addWidget(self.button_clear)
 
         # 添加布局
         # 标签/输入框垂直布局
@@ -173,6 +186,13 @@ class Tool(QMainWindow):
         self.counter = self.counter + 1
         self.local_var[f"line_description_{self.counter}"] = QLineEdit()
         self.vlayout3.addWidget(self.local_var[f"line_description_{self.counter}"])
+
+    def clear_widget(self):
+        """清除控件"""
+        for i in range(self.counter):
+            self.vlayout3.removeWidget(self.local_var[f"line_description_{i + 1}"])
+            sip.delete(self.local_var[f"line_description_{i + 1}"])
+            self.counter = 0
 
     def radio_check(self):
         if self.force_radio_t.isChecked():
