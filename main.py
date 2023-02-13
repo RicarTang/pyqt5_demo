@@ -190,7 +190,7 @@ class Tool(QMainWindow):
                 try:
                     text_list.append(v.text())
                 except RuntimeError as e:
-                    print("ERROR:{e}")
+                    print(e)
         return text_list
 
     def add_widget(self):
@@ -198,7 +198,7 @@ class Tool(QMainWindow):
         self.counter = self.counter + 1
         self.local_var[f"line_description_{self.counter}"] = QLineEdit()
         self.vlayout3.addWidget(self.local_var[f"line_description_{self.counter}"])
-        print("add success")
+        print("add succeeded")
 
     def clear_widget(self):
         """清除控件"""
@@ -207,7 +207,7 @@ class Tool(QMainWindow):
                 self.vlayout3.removeWidget(self.local_var[f"line_description_{i + 1}"])
                 sip.delete(self.local_var[f"line_description_{i + 1}"])
                 self.counter = 0
-            print("clear success")        
+            print("clear succeeded")        
 
     def radio_check(self):
         if self.force_radio_t.isChecked():
@@ -232,6 +232,8 @@ class Tool(QMainWindow):
             res,
             indent=4,
             ensure_ascii=False))
+        print("Output succeeded")
+
     def stream_out(self):
         """将输出重定向到textEdit中"""
         sys.stdout = EmittingStream(textWritten=self.outputWritten)  
