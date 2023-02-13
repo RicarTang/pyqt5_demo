@@ -1,8 +1,9 @@
 import sys
 from PyQt5.QtWidgets import (QWidget, QPushButton, QLabel, QLineEdit, QTextEdit, QFrame, QSplitter,
                              QHBoxLayout, QVBoxLayout, QApplication, QRadioButton, QMainWindow, QAction)
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon,QTextCursor
+# from PyQt5.QtCore import Qt,QObject
+from PyQt5 import QtCore
 import json
 import sip
 
@@ -33,6 +34,7 @@ class Tool(QMainWindow):
         self.hlayout5 = QHBoxLayout()  # title
         self.hlayout6 = QHBoxLayout()  # force
         self.hlayout7 = QHBoxLayout()  # button start
+        self.hlayout8 = QHBoxLayout()  # bottom Frame布局
         self.vlayout1 = QVBoxLayout()  # 左侧控件盒子
         self.vlayout2 = QVBoxLayout()  # description add clear按钮盒子
         self.vlayout3 = QVBoxLayout()  # description lineEdit控件布局
@@ -47,7 +49,9 @@ class Tool(QMainWindow):
         self.lable_title = QLabel(self)
         self.lable_force = QLabel(self)
         # textEdit
-        self.text_edit = QTextEdit()
+        self.text_edit = QTextEdit()  # 显示结果json
+        self.text_stream = QTextEdit()  # 显示控制台输出
+        self.text_stream.setReadOnly(True)  
         # button_add
         self.button_add = QPushButton("add")
         # button_start
@@ -73,6 +77,8 @@ class Tool(QMainWindow):
         self.set_layout()
         # 调同时间监听
         self.set_event()
+        # 将控制台输出重定向到textEdit中
+        self.stream_out()
 
         # resize与move方法的整合方法，窗口大小与鼠标放大缩小/移动
         self.setGeometry(300, 300, 1000, 500)
@@ -119,12 +125,12 @@ class Tool(QMainWindow):
         bottom.setFrameShape(QFrame.StyledPanel)
 
         # 分隔符
-        splitter1 = QSplitter(Qt.Horizontal)
+        splitter1 = QSplitter(QtCore.Qt.Horizontal)
         splitter1.addWidget(topleft)
         splitter1.addWidget(self.text_edit)
         splitter1.setSizes([200, 100])  # 设置两边frame比例大小
 
-        splitter2 = QSplitter(Qt.Vertical)
+        splitter2 = QSplitter(QtCore.Qt.Vertical)
         splitter2.addWidget(splitter1)
         splitter2.addWidget(bottom)
         splitter2.setSizes([400, 100])
@@ -168,6 +174,9 @@ class Tool(QMainWindow):
         self.vlayout1.addLayout(self.hlayout7)
         # 垂直布局1添加到topleft Frame
         topleft.setLayout(self.vlayout1)
+        # 添加控制台输出到bottom Frame
+        self.hlayout8.addWidget(self.text_stream)
+        bottom.setLayout(self.hlayout8)
         # 添加分隔
         self.wlayout.addWidget(splitter2)
         # # 窗口设置布局
@@ -181,7 +190,7 @@ class Tool(QMainWindow):
                 try:
                     text_list.append(v.text())
                 except RuntimeError as e:
-                    print(e)
+                    print("ERROR:{e}")
         return text_list
 
     def add_widget(self):
@@ -189,13 +198,16 @@ class Tool(QMainWindow):
         self.counter = self.counter + 1
         self.local_var[f"line_description_{self.counter}"] = QLineEdit()
         self.vlayout3.addWidget(self.local_var[f"line_description_{self.counter}"])
+        print("add success")
 
     def clear_widget(self):
         """清除控件"""
-        for i in range(self.counter):
-            self.vlayout3.removeWidget(self.local_var[f"line_description_{i + 1}"])
-            sip.delete(self.local_var[f"line_description_{i + 1}"])
-            self.counter = 0
+        if self.counter != 0:
+            for i in range(self.counter):
+                self.vlayout3.removeWidget(self.local_var[f"line_description_{i + 1}"])
+                sip.delete(self.local_var[f"line_description_{i + 1}"])
+                self.counter = 0
+            print("clear success")        
 
     def radio_check(self):
         if self.force_radio_t.isChecked():
@@ -220,7 +232,24 @@ class Tool(QMainWindow):
             res,
             indent=4,
             ensure_ascii=False))
+    def stream_out(self):
+        """将输出重定向到textEdit中"""
+        sys.stdout = EmittingStream(textWritten=self.outputWritten)  
+        sys.stderr = EmittingStream(textWritten=self.outputWritten)
+    
+    def outputWritten(self, text):  
+        """接收str的信号槽"""
+        cursor = self.text_stream.textCursor()  
+        cursor.movePosition(QTextCursor.End)  
+        cursor.insertText(text)  
+        self.text_stream.setTextCursor(cursor)  
+        self.text_stream.ensureCursorVisible()  
 
+class EmittingStream(QtCore.QObject):  
+    """发送信号"""
+    textWritten = QtCore.pyqtSignal(str)  #定义一个发送str的信号
+    def write(self, text):
+        self.textWritten.emit(str(text))  
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
